@@ -1,26 +1,29 @@
-name: spotify script that removes first song of x playlist
+name: Spotify Script that Removes First Song of Playlist
 
 on:
-  push:
-    branches:
-      - action
+  schedule:
+    - cron: "0 0 * * 0"
 
 jobs:
   run_index_js:
     runs-on: ubuntu-latest
 
+    env:
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Use node.js
+      - name: Use Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'
-      
+          node-version: "16"
+
       - name: Install dependencies
         run: npm install
 
       - name: Run index.js
         run: node index.js
-    

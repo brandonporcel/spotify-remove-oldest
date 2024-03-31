@@ -45,7 +45,7 @@ const refreshToken = async () => {
 };
 
 const main = async () => {
-  const playlistsIds = ["09p0xLdtj9hZWfE7hf8LUx"];
+  const playlistsIds = ["25jCy3aG3muLRDT8wRwufw"];
   await refreshToken();
   playlistsIds.forEach(getPlaylist);
 };
