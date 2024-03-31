@@ -9,6 +9,11 @@ jobs:
   run_index_js:
     runs-on: ubuntu-latest
 
+    env:
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
