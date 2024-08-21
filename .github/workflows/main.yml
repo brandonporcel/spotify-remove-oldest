@@ -3,6 +3,9 @@ name: Spotify Script that Removes First Song of Playlist
 on:
   schedule:
     - cron: "0 0 * * 0"
+  push:
+    branches:
+      - main
 
 jobs:
   run_index_js:
