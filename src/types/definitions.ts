@@ -72,7 +72,7 @@ export interface UserSavedTrackPagination {
   total: number;
 }
 
-interface PlaylistTrack {
+export interface PlaylistTrack {
   added_at: string;
   added_by: {
     external_urls: {

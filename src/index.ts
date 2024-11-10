@@ -2,15 +2,17 @@ import dotenv from "dotenv";
 import axios from "axios";
 import { joinUrlParams } from "./utils";
 import {
+  PlaylistTrack,
   Playlist,
   UserPlaylistTrackPagination,
   UserSavedTrackPagination,
+  SavedTrack,
 } from "./types/definitions";
 dotenv.config();
 
 // 🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀
 const DELETE_FROM_LIKED_SONGS = false;
-const PLAYLIST_IDS: string[] = ["5M0teXNh3hNHp5dAADP5lO"];
+const PLAYLIST_IDS: string[] = ["2lzWkd6ERuRR46B2qshGho"];
 
 const credentials = {
   client_id: process.env.CLIENT_ID,
@@ -20,9 +22,8 @@ const credentials = {
 let accessToken = "";
 
 const refreshToken = async () => {
-  // esto me funciono para eliminar de mis likes, no para eliminar de una playlist
-  // var scope = "playlist-read-private playlist-modify-private user-read-private";
-
+  // LIKED AND PLAYLIST
+  //  var scope = "playlist-modify-public playlist-modify-private";
   const { client_id, client_secret, refresh_token } = credentials;
 
   const authOptions = {
@@ -56,45 +57,68 @@ const refreshToken = async () => {
 const main = async () => {
   await refreshToken();
   if (DELETE_FROM_LIKED_SONGS) {
-    const { total, items } = await getOldestLikedSongs({ limit: 1 });
+    const allLikedSongs = await getAllLikedSongs();
 
-    if (total === 1) {
-      await deleteOldestLikedSong(items[0].track.id);
-      console.log(`Se elimino la cancion ${items[0].track.name}`);
-    } else {
-      const songToDelete = await getOldestLikedSongs({
-        limit: 1,
-        offset: total - 1,
-      });
-      await deleteOldestLikedSong(songToDelete.items[0].track.id);
-      console.log(`Se elimino la cancion ${songToDelete.items[0].track.name}`);
+    if (allLikedSongs.length > 0) {
+      const sortedLikedSongs = allLikedSongs.sort(
+        (a, b) =>
+          new Date(a.added_at).getTime() - new Date(b.added_at).getTime()
+      );
+
+      const oldestLikedSong = sortedLikedSongs[0];
+      await deleteOldestLikedSong(oldestLikedSong.track.id);
+      console.log(`Se eliminó la canción ${oldestLikedSong.track.name}`);
     }
   }
 
-  PLAYLIST_IDS.forEach(async (id) => {
-    const { snapshot_id, tracks } = await getPlaylist(id);
-    if (tracks.total === 1) {
-      await deleteOldestPlaylistSong(
-        id,
-        snapshot_id,
-        tracks.items[0].track.uri
-      );
-      console.log(`Se elimino la cancion ${tracks.items[0].track.name}`);
-    } else {
-      const songFromPlaylistToDelete = await getPlaylistTracks(id, {
-        limit: 1,
-        offset: tracks.total - 1,
-      });
-      await deleteOldestPlaylistSong(
-        id,
-        snapshot_id,
-        songFromPlaylistToDelete.items[0].track.uri
-      );
-      console.log(
-        `Se elimino la cancion ${songFromPlaylistToDelete.items[0].track.name}`
-      );
+  for (const id of PLAYLIST_IDS) {
+    const { snapshot_id } = await getPlaylist(id);
+    const allTracks = await getAllPlaylistTracks(id);
+    const sortedTracks = allTracks.sort(
+      (a, b) => new Date(a.added_at).getTime() - new Date(b.added_at).getTime()
+    );
+    if (sortedTracks.length > 0) {
+      const oldestTrack = sortedTracks[0];
+      await deleteOldestPlaylistSong(id, snapshot_id, oldestTrack.track.uri);
+      console.log(`Se eliminó la canción ${oldestTrack.track.name}`);
     }
-  });
+  }
+};
+
+const getAllLikedSongs = async () => {
+  let allLikedSongs: SavedTrack[] = [];
+  let limit = 50;
+
+  const firstPage = await getOldestLikedSongs({ limit, offset: 0 });
+  allLikedSongs = allLikedSongs.concat(firstPage.items);
+
+  const totalPages = Math.ceil(firstPage.total / limit);
+
+  for (let page = 1; page < totalPages; page++) {
+    const offset = page * limit;
+    const pageData = await getOldestLikedSongs({ limit, offset });
+    allLikedSongs = allLikedSongs.concat(pageData.items);
+  }
+
+  return allLikedSongs;
+};
+
+const getAllPlaylistTracks = async (playlistId: string) => {
+  let allTracks: PlaylistTrack[] = [];
+  let limit = 100;
+
+  const firstPage = await getPlaylistTracks(playlistId, { limit, offset: 0 });
+  allTracks = allTracks.concat(firstPage.items);
+
+  const totalPages = Math.ceil(firstPage.total / limit);
+
+  for (let page = 1; page < totalPages; page++) {
+    const offset = page * limit;
+    const pageData = await getPlaylistTracks(playlistId, { limit, offset });
+    allTracks = allTracks.concat(pageData.items);
+  }
+
+  return allTracks;
 };
 
 const deleteOldestPlaylistSong = async (
@@ -110,14 +134,14 @@ const deleteOldestPlaylistSong = async (
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({
+      data: JSON.stringify({
         tracks: [{ uri: songURI }],
         snapshot_id: snapshotId,
       }),
     };
     await axios(url, options);
   } catch (error: any) {
-    console.log("Delete error:", error.message);
+    console.log("Error deleting oldest song form playlist:", error.message);
   }
 };
 
