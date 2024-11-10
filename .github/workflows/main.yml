@@ -1,4 +1,4 @@
-name: Spotify Script that Removes First Song of Playlist
+name: Spotify Script that Removes First Song of Playlist & liked songs
 
 on:
   schedule:
@@ -8,7 +8,7 @@ on:
       - main
 
 jobs:
-  run_index_js:
+  run_script_js:
     runs-on: ubuntu-latest
 
     env:
@@ -28,5 +28,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run index.js
-        run: node index.js
+      - name: Make build
+        run: npm run build
+
+      - name: Run dist/script.js
+        run: node dist/script.js
