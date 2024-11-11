@@ -1,3 +1,5 @@
+import * as crypto from "crypto";
+
 export function joinUrlParams(
   filterParams: Record<string, any>,
   url: string
@@ -17,3 +19,19 @@ export function joinUrlParams(
 
   return url;
 }
+
+export const generateRandomString = (length: number) =>
+  crypto.randomBytes(60).toString("hex").slice(0, length);
+
+export const getIdFromURL = (input: string): string | null => {
+  if (/^[a-zA-Z0-9]+$/.test(input)) {
+    return input;
+  }
+
+  const regex =
+    /(?:https:\/\/)?(?:open.spotify.com\/playlist\/)([a-zA-Z0-9]+)(?:[?&].*)?/;
+
+  const match = input.match(regex);
+
+  return match ? match[1] : null;
+};
