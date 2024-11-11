@@ -7,9 +7,7 @@ dotenv.config();
 
 // 🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀
 const DELETE_FROM_LIKED_SONGS = true;
-const PLAYLIST_IDS: string[] = [
-  "https://open.spotify.com/playlist/2lzWkd6ERuRR46B2qshGho?si=9b36eea6abf1427f",
-];
+const PLAYLIST_IDS: string[] = [];
 
 const credentials = {
   client_id: process.env.CLIENT_ID,

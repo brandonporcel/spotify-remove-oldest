@@ -215,7 +215,7 @@ const main = async () => {
       const songName = await handleDeleteOldestLiked(getToken);
       console.log(
         color.bgGreen(
-          `❤️ La canción '${songName}' fue eliminada de 'liked songs'.`
+          `❤️  La canción '${songName}' fue eliminada de 'liked songs'.`
         )
       );
     } catch (error: any) {

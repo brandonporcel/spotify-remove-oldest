@@ -28,5 +28,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run script.ts
-        run: npm run script
+      - name: Make build
+        run: npm run build
+
+      - name: Run dist/script.js
+        run: node dist/script.js
