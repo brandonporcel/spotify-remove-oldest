@@ -6,7 +6,6 @@ import prompts from "prompts";
 import { generateRandomString, getIdFromURL } from "./utils";
 import handleDeleteOldestLiked from "./actions/delete-oldest-liked";
 import handleDeleteOldestPlaylist from "./actions/delete-oldest-playlist";
-
 dotenv.config();
 
 const {
