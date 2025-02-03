@@ -7,7 +7,7 @@ dotenv.config();
 
 // 🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀🎧💿📀
 const DELETE_FROM_LIKED_SONGS = true;
-const PLAYLIST_IDS: string[] = ["25jCy3aG3muLRDT8wRwufw"];
+const PLAYLIST_IDS: string[] = ["5M0teXNh3hNHp5dAADP5lO"];
 
 const credentials = {
   client_id: process.env.CLIENT_ID,
